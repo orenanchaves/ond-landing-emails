@@ -1,30 +1,36 @@
-# OND — Landing Pages
+# OND — Landings & E-mails
 
-Repositório das **landing pages do OND** — a plataforma de viagens conversacional com IA (o "vAI das viagens").
+Repositório das **landing pages** e dos **templates de e-mail** do OND — a plataforma de viagens conversacional com IA (o "vAI das viagens").
 
-Cada landing é um HTML **estático e autossuficiente** (CSS e SVGs inline, sem build, sem dependências externas). Basta abrir o arquivo no navegador ou publicar a pasta em qualquer host estático.
+Tudo aqui é HTML **estático e autossuficiente** (CSS e SVGs inline, sem build, sem dependências externas). Landings são publicadas em host estático; e-mails são templates HTML prontos para colar no provedor de envio (ou usar como base no backend).
 
 ## Estrutura
 
 ```
-ond-landing/
-├── index.html            ← hub: índice visual apontando para as landings
-├── README.md             ← este arquivo
-└── assessoria/
-    └── index.html        ← Landing: Assessoria OND
+ond-landing-emails/
+├── index.html              ← hub: índice visual das landings
+├── README.md               ← este arquivo
+├── landings/
+│   └── assessoria/
+│       └── index.html      ← Landing: Assessoria OND
+└── emails/                 ← templates de e-mail do OND (ex.: pagamento confirmado)
+    └── README.md
 ```
 
-Novas landings entram como uma nova subpasta (`ex.: /copa/`, `/b2b/`) com seu próprio `index.html`, e ganham um card no `index.html` da raiz.
+- **Nova landing** → nova subpasta em `landings/` (ex.: `landings/copa/`) com seu `index.html`, e um card no `index.html` da raiz.
+- **Novo e-mail** → novo arquivo/subpasta em `emails/` (ex.: `emails/assessoria-pagamento-confirmado.html`).
 
 ---
 
-## Landing: Assessoria OND
+## Landings
+
+### Assessoria OND — `landings/assessoria/`
 
 Landing personalizada enviada por link (WhatsApp) depois que o lead conversa com o **OND vAI**. Vende a **Assessoria OND** — um especialista humano que planeja e ajusta a viagem junto com o cliente, apoiado pela IA da OND — por **R$ 32,50** (pagamento único).
 
 Duas telas na mesma página: a **oferta** (view inicial) e a **confirmação de pagamento** (exibida ao clicar em "Contratar agora"; hoje é uma demo, o checkout real entra nesse ponto).
 
-### Personalização por querystring
+#### Personalização por querystring
 
 A página lê os dados do lead da URL. Enquanto é estática, os parâmetros vêm pela querystring; em produção, a rota `/advisory/<id>` resolve esses campos no backend e injeta na página.
 
@@ -45,9 +51,17 @@ https://ond-assessoria.pages.dev/?nome=Renan&destino=Paris&inicio=10/09&fim=15/0
 
 Sem parâmetros, a página cai nos valores de demonstração.
 
-### Deploy atual
+#### Deploy atual
 
 - **Cloudflare Pages:** https://ond-assessoria.pages.dev
+
+---
+
+## E-mails
+
+Templates de e-mail transacionais e de campanha do OND, em `emails/`. Cada template é um HTML autossuficiente pensado para renderizar bem em clientes de e-mail (estilos inline, layout simples).
+
+Primeiro previsto: **e-mail de "pagamento confirmado"** da Assessoria OND — o recibo enviado depois que o cliente contrata (espelha a tela de confirmação da landing). Ainda a produzir.
 
 ---
 
@@ -56,13 +70,13 @@ Sem parâmetros, a página cai nos valores de demonstração.
 Por ser HTML estático, qualquer um destes funciona:
 
 ```bash
-# abrir direto no navegador
-start assessoria/index.html          # Windows
-open  assessoria/index.html          # macOS
+# abrir uma landing direto no navegador
+start landings/assessoria/index.html     # Windows
+open  landings/assessoria/index.html     # macOS
 
-# ou servir a pasta (permite testar a querystring com URLs limpas)
+# ou servir a raiz do repo (permite testar a querystring com URLs limpas)
 python -m http.server 8080
-# → http://localhost:8080/assessoria/?nome=Renan&destino=Roma&inicio=01/12&fim=07/12
+# → http://localhost:8080/landings/assessoria/?nome=Renan&destino=Roma&inicio=01/12&fim=07/12
 ```
 
 ## Como fazer deploy
@@ -71,10 +85,10 @@ Cada landing pode ir para qualquer host estático (Cloudflare Pages, GitHub Page
 
 ```bash
 # publica a pasta da assessoria
-wrangler pages deploy assessoria --project-name ond-assessoria
+wrangler pages deploy landings/assessoria --project-name ond-assessoria
 ```
 
-> A landing da Assessoria segue viva também em `C:\_tudo\Agama\OND\ond-assessoria\` (fonte original / projeto Wrangler). Este repo é a cópia versionada e o lar das landings do OND daqui pra frente.
+> A landing da Assessoria segue viva também em `C:\_tudo\Agama\OND\ond-assessoria\` (fonte original / projeto Wrangler). Este repo é a cópia versionada e o lar das landings e e-mails do OND daqui pra frente.
 
 ---
 
