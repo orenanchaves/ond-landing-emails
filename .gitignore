@@ -1,0 +1,15 @@
+# OND landing pages — static HTML, no build step.
+
+# Cloudflare Wrangler / Pages
+.wrangler/
+.dev.vars
+
+# Dependências (caso alguma landing venha a ter build no futuro)
+node_modules/
+dist/
+
+# SO / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
