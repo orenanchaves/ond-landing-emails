@@ -1,0 +1,28 @@
+Assunto: Pagamento confirmado — sua Assessoria OND está garantida
+
+OND
+
+PAGAMENTO CONFIRMADO, {{nome}}!
+
+Recebemos seu pedido de assessoria para {{destino}} ({{data_inicio}}-{{data_fim}}).
+Um especialista OND vai planejar essa viagem junto com você — voos, hospedagem,
+roteiro e os detalhes.
+
+Pra começar, responda este e-mail com dois ou três horários em que você prefere
+conversar, e a gente confirma o encontro.
+
+--------------------------------------------
+  Serviço: Assessoria OND
+  Destino: {{destino}}
+  Datas:   {{data_inicio}}-{{data_fim}}
+  Valor:   R$ {{preco}}
+  Status:  Confirmado
+--------------------------------------------
+
+Falar com meu especialista: {{cta_url}}
+
+Até já,
+Equipe OND
+
+--
+OND · Planeje sem estresse — o vAI das viagens

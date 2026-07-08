@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  OND — E-MAIL: Pagamento confirmado (Assessoria OND)
+  ------------------------------------------------------------
+  Assunto (subject): Pagamento confirmado — sua Assessoria OND está garantida ✦
+  Preheader:         Um especialista OND vai planejar sua viagem com você.
+
+  HTML EMAIL-SAFE: layout 100% em <table>, CSS inline, largura ~600px,
+  fontes web-safe (Arial/Helvetica). Sem flex/grid/var()/custom font.
+  Logo em TEXTO estilizado ("OND") — e-mail costuma bloquear SVG/imagem.
+
+  Placeholders para o backend preencher:
+    {{nome}}         ex.: Renan
+    {{destino}}      ex.: Paris
+    {{data_inicio}}  ex.: 10/09
+    {{data_fim}}     ex.: 15/09
+    {{preco}}        ex.: 32,50   (somente o número; "R$" já está no template)
+    {{cta_url}}      ex.: https://wa.me/55XXXXXXXXXXX  ou  mailto:contato@ond...
+  ============================================================
+-->
+<html lang="pt-BR" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="x-apple-disable-message-reformatting">
+<title>Pagamento confirmado — Assessoria OND</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f2fb; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+
+  <!-- Preheader (texto oculto de preview na caixa de entrada) -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#f4f2fb; opacity:0;">
+    Um especialista OND vai planejar sua viagem para {{destino}} com você.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </div>
+
+  <!-- Wrapper de fundo (full width) -->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f2fb;">
+    <tr>
+      <td align="center" style="padding:24px 12px;">
+
+        <!-- Container 600px -->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px;">
+
+          <!-- Logo / wordmark -->
+          <tr>
+            <td align="center" style="padding:8px 0 20px 0;">
+              <span style="font-family:'Bio Sans',Arial,Helvetica,sans-serif; font-size:26px; font-weight:bold; letter-spacing:2px; color:#7F11F4;">OND</span>
+            </td>
+          </tr>
+
+          <!-- Card branco -->
+          <tr>
+            <td style="background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e8e0f0;">
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+
+                <!-- Header roxo com selo de confirmação -->
+                <tr>
+                  <td align="center" style="background-color:#290756; background-image:linear-gradient(135deg,#7F11F4 0%,#560fb2 55%,#290756 100%); padding:36px 24px 32px 24px;">
+                    <!-- Selo verde (círculo com check em texto) -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                      <tr>
+                        <td align="center" valign="middle" width="64" height="64" style="width:64px; height:64px; background-color:#11F558; border-radius:50%; font-family:Arial,Helvetica,sans-serif; font-size:34px; line-height:64px; color:#0a3d17; font-weight:bold;">&#10003;</td>
+                      </tr>
+                    </table>
+                    <p style="margin:20px 0 0 0; font-family:'Bio Sans',Arial,Helvetica,sans-serif; font-size:12px; font-weight:bold; letter-spacing:2px; text-transform:uppercase; color:#F59811;">Pagamento confirmado</p>
+                    <h1 style="margin:8px 0 0 0; font-family:'Bio Sans',Arial,Helvetica,sans-serif; font-size:26px; line-height:1.25; font-weight:bold; color:#ffffff;">Pagamento confirmado, {{nome}}!</h1>
+                  </td>
+                </tr>
+
+                <!-- Corpo -->
+                <tr>
+                  <td style="padding:30px 32px 8px 32px; font-family:Arial,Helvetica,sans-serif; font-size:16px; line-height:1.6; color:#1e1e1e;">
+                    <p style="margin:0 0 16px 0;">
+                      Recebemos seu pedido de assessoria para <strong style="color:#560fb2;">{{destino}}</strong> ({{data_inicio}}&ndash;{{data_fim}}). Um especialista OND vai planejar essa viagem junto com você &mdash; voos, hospedagem, roteiro e os detalhes.
+                    </p>
+                    <p style="margin:0 0 8px 0;">
+                      Pra começar, <strong>responda este e-mail com dois ou três horários</strong> em que você prefere conversar, e a gente confirma o encontro.
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- Mini recibo -->
+                <tr>
+                  <td style="padding:20px 32px 8px 32px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f7f2ff; border:1px solid #e8e0f0; border-radius:12px;">
+                      <tr>
+                        <td style="padding:16px 18px; font-family:Arial,Helvetica,sans-serif; font-size:14px; line-height:1.5; color:#1e1e1e;">
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td style="padding:6px 0; color:#6b6a6a;">Serviço</td>
+                              <td align="right" style="padding:6px 0; font-weight:bold;">Assessoria OND</td>
+                            </tr>
+                            <tr>
+                              <td style="padding:6px 0; border-top:1px solid #e8e0f0; color:#6b6a6a;">Destino</td>
+                              <td align="right" style="padding:6px 0; border-top:1px solid #e8e0f0; font-weight:bold;">{{destino}}</td>
+                            </tr>
+                            <tr>
+                              <td style="padding:6px 0; border-top:1px solid #e8e0f0; color:#6b6a6a;">Datas</td>
+                              <td align="right" style="padding:6px 0; border-top:1px solid #e8e0f0; font-weight:bold;">{{data_inicio}}&ndash;{{data_fim}}</td>
+                            </tr>
+                            <tr>
+                              <td style="padding:6px 0; border-top:1px solid #e8e0f0; color:#6b6a6a;">Valor</td>
+                              <td align="right" style="padding:6px 0; border-top:1px solid #e8e0f0; font-weight:bold;">R$&nbsp;{{preco}}</td>
+                            </tr>
+                            <tr>
+                              <td style="padding:6px 0; border-top:1px solid #e8e0f0; color:#6b6a6a;">Status</td>
+                              <td align="right" style="padding:6px 0; border-top:1px solid #e8e0f0; font-weight:bold; color:#0a7a34;">&#9679;&nbsp;Confirmado</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- CTA botão (bulletproof) -->
+                <tr>
+                  <td align="center" style="padding:24px 32px 8px 32px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td align="center" bgcolor="#7F11F4" style="border-radius:999px;">
+                          <a href="{{cta_url}}" target="_blank" style="display:inline-block; padding:15px 32px; font-family:'Bio Sans',Arial,Helvetica,sans-serif; font-size:16px; font-weight:bold; color:#ffffff; text-decoration:none; border-radius:999px;">Falar com meu especialista</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Assinatura -->
+                <tr>
+                  <td style="padding:20px 32px 32px 32px; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.6; color:#1e1e1e;">
+                    <p style="margin:0;">Até já,</p>
+                    <p style="margin:2px 0 0 0; font-weight:bold; color:#560fb2;">Equipe OND</p>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- Rodapé discreto -->
+          <tr>
+            <td align="center" style="padding:22px 16px 8px 16px; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:1.6; color:#8a8795;">
+              <p style="margin:0;"><strong style="color:#7F11F4;">OND</strong> &middot; Planeje sem estresse</p>
+              <p style="margin:6px 0 0 0;">o vAI das viagens</p>
+            </td>
+          </tr>
+
+        </table>
+        <!-- /Container -->
+
+      </td>
+    </tr>
+  </table>
+  <!-- /Wrapper -->
+
+</body>
+</html>
