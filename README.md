@@ -11,8 +11,10 @@ ond-landing-emails/
 ├── index.html              ← hub: índice visual das landings
 ├── README.md               ← este arquivo
 ├── landings/
-│   └── assessoria/
-│       └── index.html      ← Landing: Assessoria OND
+│   ├── assessoria/
+│   │   └── index.html      ← Landing: Assessoria OND
+│   └── vai-live/
+│       └── index.html      ← Protótipo: painel OND vAI — conversas ao vivo
 └── emails/                 ← templates de e-mail do OND (ex.: pagamento confirmado)
     └── README.md
 ```
@@ -54,6 +56,24 @@ Sem parâmetros, a página cai nos valores de demonstração.
 #### Deploy atual
 
 - **Cloudflare Pages:** https://ond-assessoria.pages.dev
+
+---
+
+### OND vAI — Conversas ao vivo (protótipo) — `landings/vai-live/`
+
+Protótipo navegável do **painel de monitoramento das conversas do OND vAI em tempo real** — a base visual para o **Renan Rodrigues** montar a versão real (plugada nas conversas de verdade via KV/API).
+
+HTML único e autossuficiente, no design system OND (dark). Contém: KPIs no topo, lista de conversas com busca/filtros (Todas / Em andamento / Concluídas), transcrição ao vivo (com indicador de digitação e botão "Assumir no WhatsApp") e painel de contexto da viagem extraído pelo vAI. **Dados são fictícios** (conversas simuladas por JS só para demonstração) — trocar os arrays `CONVS`/`TRANSCRIPT` pela fonte real na hora de montar.
+
+#### Deploy atual
+
+- **Cloudflare Pages:** https://ond-vai-live.pages.dev
+
+```bash
+wrangler pages deploy landings/vai-live --project-name ond-vai-live --branch main
+```
+
+> Também é citado (menção + link, sem embed) na aba **"vAI ao vivo"** do painel privado **OND · firma** (`C:\Users\renan\ond-firma`).
 
 ---
 

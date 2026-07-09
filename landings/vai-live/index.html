@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OND vAI · Conversas ao vivo — protótipo</title>
+<meta name="description" content="Protótipo do painel de conversas ao vivo do OND vAI — mockup navegável com dados fictícios, base para o Renan Rodrigues montar a versão real.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0d0d14">
+<style>
+  :root{
+    color-scheme:dark;
+    /* OND design system — tema ESCURO (padrão) · contraste reforçado */
+    --bg:#0d0d14; --surface:#16161f; --card:#1c1c30; --card-2:#2a2a48;
+    --border:#2c2c4c; --border-soft:#38385e;
+    --text:#f5f3ff; --muted:#a6a6d0; --muted-2:#8484b6;
+    --purple:#7c3fff; --purple-400:#a983ff; --purple-600:#6b2fff; --purple-900:#2b0a5e;
+    --green:#00e676; --green-600:#00c853;
+    --gold:#ffd60a; --blue:#4d9fff; --red:#f09595; --whatsapp:#25d366; --wa-ink:#04180c;
+    --wordmark:#ffffff;
+    --topbar-bg:rgba(18,18,28,.74);
+    --scroll:#38385e; --scroll-hover:#4a4a72;
+    --glow:rgba(124,63,255,.16);
+    --grad1:rgba(124,63,255,.12); --grad2:rgba(0,230,118,.06);
+    --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px; --r-pill:999px;
+    --sh-sm:0 2px 8px rgba(0,0,0,.3); --sh-md:0 8px 30px rgba(0,0,0,.35);
+    --sh-glow:0 0 0 1px rgba(124,63,255,.35), 0 8px 30px rgba(124,63,255,.18);
+    --ff:'Bio Sans','Onest','Hanken Grotesk',system-ui,-apple-system,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  /* tema CLARO — acionado pelo toggle (data-theme=light) */
+  :root[data-theme="light"]{
+    color-scheme:light;
+    --bg:#f3f0fb; --surface:#ffffff; --card:#f7f4ff; --card-2:#ebe5fb;
+    --border:#e6dff4; --border-soft:#dcd2f0;
+    --text:#191426; --muted:#5f5d7d; --muted-2:#847fa6;
+    --purple:#7c3fff; --purple-400:#6b2fff; --purple-600:#5e17c7; --purple-900:#2b0a5e;
+    --green:#009e57; --green-600:#00934a;
+    --gold:#b07d00; --blue:#0066ff; --red:#d64545; --whatsapp:#128c4a; --wa-ink:#ffffff;
+    --wordmark:#1e1e1e;
+    --topbar-bg:rgba(255,255,255,.80);
+    --scroll:#dcd4ee; --scroll-hover:#c7bce4;
+    --glow:rgba(124,63,255,.09);
+    --grad1:rgba(124,63,255,.08); --grad2:rgba(0,158,87,.05);
+    --sh-sm:0 2px 8px rgba(46,10,94,.08); --sh-md:0 10px 34px rgba(46,10,94,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--ff); background:var(--bg); color:var(--text);
+    font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+    transition:background-color .25s ease,color .25s ease;
+    background-image:
+      radial-gradient(900px 500px at 85% -10%, var(--grad1), transparent 60%),
+      radial-gradient(700px 400px at 0% 100%, var(--grad2), transparent 55%);
+  }
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:99px;border:2px solid transparent;background-clip:padding-box}
+  ::-webkit-scrollbar-thumb:hover{background:var(--scroll-hover);background-clip:padding-box}
+  button{font-family:inherit;cursor:pointer}
+
+  /* ---------- ícones monocromáticos (line, currentColor) ---------- */
+  .ic{width:15px;height:15px;flex:0 0 auto;display:inline-block;vertical-align:-3px;
+     fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .k-label .ic{width:14px;height:14px;vertical-align:-2px;opacity:.85}
+  .fi .ic{width:16px;height:16px;color:var(--muted)}
+  .ctx-head h3 .ic,.o-top .ic,.ci-row .ic{color:var(--muted)}
+  .take .ic{width:16px;height:16px}
+  .flag-svg{width:21px;height:14px;border-radius:2.5px;overflow:hidden;display:inline-block;
+     vertical-align:-3px;box-shadow:0 0 0 1px rgba(0,0,0,.18);flex:0 0 auto}
+  .fv .flag-svg{vertical-align:-2px;margin-right:2px}
+  .flag-chip{display:inline-flex;align-items:center;justify-content:center;min-width:21px;height:14px;
+     padding:0 3px;border-radius:2.5px;background:var(--card-2);color:var(--muted);
+     font-size:9px;font-weight:800;letter-spacing:.02em;vertical-align:-2px}
+
+  /* ---------- TOP BAR ---------- */
+  .topbar{
+    display:flex; align-items:center; gap:16px;
+    padding:12px 22px; border-bottom:1px solid var(--border);
+    background:var(--topbar-bg); backdrop-filter:blur(12px);
+    position:sticky; top:0; z-index:20;
+  }
+  .brand{display:flex;align-items:center;gap:10px}
+  .ond-lockup{height:22px;width:auto;display:block;color:var(--wordmark)}
+  .vai-tag{font-size:12px;font-weight:800;letter-spacing:.02em;color:#fff;
+    background:linear-gradient(135deg,var(--purple),var(--purple-600));
+    padding:2px 9px;border-radius:var(--r-pill);box-shadow:0 3px 12px rgba(124,63,255,.35)}
+  .brand-txt{border-left:1px solid var(--border-soft);padding-left:11px;margin-left:3px}
+  .brand-title{font-weight:700;font-size:14px;letter-spacing:-.01em}
+  .brand .sub{font-size:11px;color:var(--muted);font-weight:500}
+  .live-pill{
+    display:inline-flex;align-items:center;gap:7px;
+    padding:5px 12px 5px 10px;border-radius:var(--r-pill);
+    background:color-mix(in srgb, var(--green) 12%, transparent);
+    border:1px solid color-mix(in srgb, var(--green) 32%, transparent);
+    color:var(--green);font-weight:700;font-size:12px;letter-spacing:.02em;
+  }
+  .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(0,230,118,.6);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,230,118,.55)}70%{box-shadow:0 0 0 7px rgba(0,230,118,0)}100%{box-shadow:0 0 0 0 rgba(0,230,118,0)}}
+  .spacer{flex:1}
+  .partner-chip{
+    display:flex;align-items:center;gap:9px;padding:5px 6px 5px 12px;
+    border:1px solid var(--border-soft);border-radius:var(--r-pill);background:var(--card);
+  }
+  .partner-chip .pc-txt{text-align:right;line-height:1.15}
+  .partner-chip .pc-name{font-size:12.5px;font-weight:600}
+  .partner-chip .pc-role{font-size:10.5px;color:var(--muted)}
+  .partner-chip .pc-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple-600));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff}
+  .ghost-btn{background:transparent;border:1px solid var(--border-soft);color:var(--muted);padding:7px 13px;border-radius:var(--r-sm);font-size:12.5px;font-weight:500;transition:.15s}
+  .ghost-btn:hover{color:var(--text);border-color:#3a3a5a}
+
+  /* ---------- KPI STRIP ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px 22px 4px}
+  .kpi{
+    background:linear-gradient(180deg,var(--card),var(--surface));
+    border:1px solid var(--border);border-radius:var(--r-lg);padding:15px 16px;position:relative;overflow:hidden;
+  }
+  .kpi::after{content:"";position:absolute;inset:0 0 auto auto;width:120px;height:120px;background:radial-gradient(circle at top right,var(--glow),transparent 70%);pointer-events:none}
+  .kpi .k-label{font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.03em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+  .kpi .k-val{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:6px;line-height:1}
+  .kpi .k-val small{font-size:14px;font-weight:600;color:var(--muted)}
+  .kpi .k-delta{font-size:11.5px;font-weight:600;margin-top:7px;display:inline-flex;align-items:center;gap:4px}
+  .k-delta.up{color:var(--green)} .k-delta.down{color:var(--red)} .k-delta.flat{color:var(--muted)}
+  .kpi.accent .k-val{color:var(--green)}
+  .spark{position:absolute;right:12px;bottom:10px;opacity:.55}
+
+  /* ---------- MAIN GRID ---------- */
+  .main{display:grid;grid-template-columns:340px 1fr 300px;gap:14px;padding:14px 22px 22px;min-height:calc(100vh - 210px)}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);display:flex;flex-direction:column;overflow:hidden}
+
+  /* ----- LEFT: conversation list ----- */
+  .list-head{padding:14px 14px 10px;border-bottom:1px solid var(--border)}
+  .search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:8px 11px}
+  .search input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font-size:13px;font-family:inherit}
+  .search input::placeholder{color:var(--muted-2)}
+  .search svg{opacity:.6}
+  .tabs{display:flex;gap:6px;margin-top:11px}
+  .tab{flex:1;text-align:center;padding:7px 4px;border-radius:var(--r-sm);border:1px solid transparent;background:var(--card);color:var(--muted);font-size:12px;font-weight:600;transition:.15s;position:relative}
+  .tab .cnt{display:inline-block;margin-left:5px;font-size:10.5px;background:var(--card-2);color:var(--muted);padding:1px 6px;border-radius:var(--r-pill)}
+  .tab:hover{color:var(--text)}
+  .tab.active{background:rgba(124,63,255,.14);border-color:rgba(124,63,255,.4);color:var(--purple-400)}
+  .tab.active .cnt{background:rgba(124,63,255,.25);color:var(--purple-400)}
+  .conv-list{overflow-y:auto;flex:1;padding:8px}
+  .conv{
+    display:block;width:100%;text-align:left;background:transparent;border:1px solid transparent;
+    border-radius:var(--r-md);padding:11px 12px;margin-bottom:4px;transition:.14s;position:relative;
+  }
+  .conv:hover{background:var(--card)}
+  .conv.sel{background:var(--card);border-color:rgba(124,63,255,.45);box-shadow:inset 3px 0 0 var(--purple)}
+  .conv-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .conv-av{width:30px;height:30px;border-radius:9px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:15px;background:var(--card-2)}
+  .conv-name{font-weight:600;font-size:13.5px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .conv-time{font-size:10.5px;color:var(--muted-2);flex:0 0 auto}
+  .conv-prev{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:38px}
+  .conv-meta{display:flex;align-items:center;gap:8px;margin-top:7px;padding-left:38px}
+  .stat-dot{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:var(--r-pill)}
+  .sd-live{background:rgba(0,230,118,.12);color:var(--green)}
+  .sd-live i{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.8s infinite}
+  .sd-wait{background:rgba(255,214,10,.12);color:var(--gold)}
+  .sd-done{background:rgba(136,136,176,.14);color:var(--muted)}
+  .conv-badge{margin-left:auto;font-size:10px;font-weight:700;background:var(--purple);color:#fff;min-width:18px;height:18px;padding:0 5px;border-radius:var(--r-pill);display:inline-flex;align-items:center;justify-content:center}
+
+  /* ----- CENTER: transcript ----- */
+  .chat-head{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .chat-head .ch-av{width:38px;height:38px;border-radius:11px;background:var(--card-2);display:flex;align-items:center;justify-content:center;font-size:19px}
+  .chat-head .ch-name{font-weight:700;font-size:15px}
+  .chat-head .ch-sub{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
+  .chat-head .ch-actions{margin-left:auto;display:flex;gap:8px}
+  .icon-btn{width:34px;height:34px;border-radius:var(--r-sm);border:1px solid var(--border-soft);background:var(--card);color:var(--muted);display:flex;align-items:center;justify-content:center;transition:.15s}
+  .icon-btn:hover{color:var(--text);border-color:#3a3a5a}
+  .chat-body{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:14px}
+  .daysep{text-align:center;font-size:11px;color:var(--muted-2);margin:2px 0}
+  .daysep span{background:var(--card);padding:3px 12px;border-radius:var(--r-pill);border:1px solid var(--border)}
+  .msg{max-width:74%;display:flex;flex-direction:column;gap:3px}
+  .msg .bub{padding:10px 14px;border-radius:16px;font-size:13.5px;line-height:1.55;position:relative}
+  .msg .mt{font-size:10.5px;color:var(--muted-2);padding:0 4px}
+  .msg.user{align-self:flex-end;align-items:flex-end}
+  .msg.user .bub{background:linear-gradient(135deg,var(--purple),var(--purple-600));color:#fff;border-bottom-right-radius:5px}
+  .msg.ai{align-self:flex-start;align-items:flex-start}
+  .msg.ai .bub{background:var(--card);border:1px solid var(--border-soft);border-bottom-left-radius:5px}
+  .msg.ai .bub .who{font-size:10.5px;font-weight:700;color:var(--purple-400);margin-bottom:3px;display:flex;align-items:center;gap:5px}
+  .bub .card-inline{margin-top:9px;border-top:1px solid var(--border);padding-top:9px;display:flex;flex-direction:column;gap:6px}
+  .ci-row{display:flex;align-items:center;gap:8px;font-size:12.5px}
+  .ci-row b{color:var(--green);font-weight:700}
+  .typing{align-self:flex-start;display:flex;align-items:center;gap:8px;padding:11px 15px;background:var(--card);border:1px solid var(--border-soft);border-radius:16px;border-bottom-left-radius:5px}
+  .typing i{width:7px;height:7px;border-radius:50%;background:var(--purple-400);animation:blink 1.4s infinite both}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+  .chat-foot{padding:11px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
+  .chat-foot .obs{display:inline-flex;align-items:center;gap:7px}
+  .chat-foot .take{margin-left:auto;background:var(--whatsapp);color:#04180c;border:0;padding:9px 15px;border-radius:var(--r-sm);font-weight:700;font-size:12.5px;display:inline-flex;align-items:center;gap:7px}
+  .chat-foot .take:hover{filter:brightness(1.08)}
+
+  /* ----- RIGHT: trip context ----- */
+  .ctx-head{padding:14px 16px 12px;border-bottom:1px solid var(--border)}
+  .ctx-head h3{font-size:13px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:7px}
+  .ctx-head p{font-size:11px;color:var(--muted);margin-top:3px}
+  .ctx-body{overflow-y:auto;flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:16px}
+  .ctx-block .cb-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted-2);font-weight:700;margin-bottom:9px}
+  .field{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+  .field .fi{width:28px;height:28px;border-radius:8px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:14px;flex:0 0 auto}
+  .field .fl{font-size:11px;color:var(--muted)}
+  .field .fv{font-size:13px;font-weight:600}
+  .field .fv.pend{color:var(--muted-2);font-weight:500;font-style:italic}
+  .prog{height:6px;border-radius:99px;background:var(--card-2);overflow:hidden;margin-top:4px}
+  .prog i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--purple),var(--purple-400))}
+  .offer{background:var(--card);border:1px solid var(--border-soft);border-radius:var(--r-md);padding:11px 12px}
+  .offer .o-top{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600}
+  .offer .o-price{color:var(--green);font-weight:800;font-size:15px}
+  .offer .o-sub{font-size:11px;color:var(--muted);margin-top:3px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:var(--r-pill);background:color-mix(in srgb,var(--purple) 12%,transparent);color:var(--purple-400);border:1px solid color-mix(in srgb,var(--purple) 26%,transparent)}
+  .tag-hot{background:color-mix(in srgb,var(--purple) 22%,transparent);border-color:color-mix(in srgb,var(--purple) 45%,transparent);font-weight:700}
+
+  .foot-note{padding:10px 22px 26px;text-align:center;color:var(--muted-2);font-size:11px}
+  @media(max-width:1180px){
+    .main{grid-template-columns:300px 1fr}
+    .panel.ctx{display:none}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+<script>
+// Tema — aplica o salvo antes do paint (sem flash). Padrão: escuro (identidade OND).
+(function(){
+  var root=document.documentElement, KEY='ondVaiTheme';
+  var saved=null; try{ saved=localStorage.getItem(KEY); }catch(_){}
+  root.setAttribute('data-theme', saved==='light' ? 'light' : 'dark');
+})();
+document.addEventListener('DOMContentLoaded',function(){
+  var root=document.documentElement, KEY='ondVaiTheme';
+  var btn=document.getElementById('themeBtn'), icon=document.getElementById('themeIcon'),
+      meta=document.querySelector('meta[name="theme-color"]');
+  function paint(){
+    var light=root.getAttribute('data-theme')==='light';
+    if(icon) icon.textContent = light ? '🌙' : '☀️';
+    if(btn) btn.title = light ? 'Mudar para tema escuro' : 'Mudar para tema claro';
+    if(meta) meta.setAttribute('content', light ? '#f3f0fb' : '#0d0d14');
+  }
+  paint();
+  if(btn) btn.addEventListener('click',function(){
+    var next = root.getAttribute('data-theme')==='light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    try{ localStorage.setItem(KEY, next); }catch(_){}
+    paint();
+  });
+});
+</script>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<div class="topbar">
+  <div class="brand">
+    <!-- Logo oficial OND (lockup) — estrela SEMPRE #7F11F4; wordmark adapta ao tema (currentColor) -->
+    <svg class="ond-lockup" viewBox="0 0 951.32 497.26" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OND">
+      <path fill="#7F11F4" d="M327.85,243.05l-69.42-45.05-57.11-117.28c-.76-1.55-2.13-2.44-3.59-2.67-1.46.24-2.83,1.12-3.59,2.67l-57.11,117.28-69.42,45.05c-1.53.99-2.26,2.62-2.21,4.23-.04,1.61.69,3.24,2.21,4.23l69.42,45.05,57.11,117.28c.76,1.55,2.13,2.44,3.59,2.67,1.46-.24,2.83-1.12,3.59-2.67l57.11-117.28,69.42-45.05c1.53-.99,2.26-2.62,2.21-4.23.04-1.61-.69-3.24-2.21-4.23Z"/>
+      <path fill="currentColor" d="M373.12,248.52c0-42.54,34.63-76.96,77.17-76.96s77.18,34.42,77.18,76.96-34.63,77.18-77.18,77.18-77.17-34.42-77.17-77.18ZM477.88,248.52c0-15.18-12.4-27.58-27.58-27.58s-27.58,12.4-27.58,27.58,12.4,27.79,27.58,27.79,27.58-12.4,27.58-27.79Z"/>
+      <path fill="currentColor" d="M542.62,171.56h44.05c1.56,0,3.03.73,3.97,1.97l59.71,78.19h1.54v-75.15c0-2.76,2.24-5,5-5h41.53c2.76,0,5,2.24,5,5v144.14c0,2.76-2.24,5-5,5h-44.1c-1.53,0-2.98-.7-3.93-1.91l-59.49-75.6h-1.76v72.51c0,2.76-2.24,5-5,5h-41.53c-2.76,0-5-2.24-5-5v-144.14c0-2.76,2.24-5,5-5Z"/>
+      <path fill="currentColor" d="M880.82,247.53c0,50.65-43.38,78.17-75.75,78.17h-86.82c-2.76,0-5-2.24-5-5v-144.14c0-2.76,2.24-5,5-5h88.59c37.87,0,73.99,28.85,73.99,75.97ZM828.86,247.31c0-24.88-15.63-35.01-39.42-35.01h-24.66v72.67h26.42c21.58,0,37.65-14.53,37.65-37.65Z"/>
+    </svg>
+    <span class="vai-tag">vAI</span>
+    <div class="brand-txt">
+      <div class="brand-title">Conversas ao vivo</div>
+      <div class="sub">Painel do parceiro · monitoramento em tempo real</div>
+    </div>
+  </div>
+
+  <div class="live-pill"><span class="live-dot"></span> AO VIVO</div>
+
+  <div class="spacer"></div>
+
+  <button class="ghost-btn" id="themeBtn" title="Alternar tema claro/escuro" aria-label="Alternar tema"><span id="themeIcon">☀️</span></button>
+  <button class="ghost-btn">↻ Atualizar</button>
+  <div class="partner-chip">
+    <div class="pc-txt">
+      <div class="pc-name">Agência Rota Sul</div>
+      <div class="pc-role">Parceiro OND · Bronze</div>
+    </div>
+    <div class="pc-av">RS</div>
+  </div>
+  <button class="ghost-btn">Sair</button>
+</div>
+
+<!-- ============ KPIs ============ -->
+<div class="kpis">
+  <div class="kpi accent">
+    <div class="k-label"><i data-ic="activity"></i> Conversas ativas</div>
+    <div class="k-val" id="kpiActive">7</div>
+    <div class="k-delta up">▲ 3 nos últimos 15 min</div>
+  </div>
+  <div class="kpi">
+    <div class="k-label"><i data-ic="message"></i> Conversas hoje</div>
+    <div class="k-val">148</div>
+    <div class="k-delta up">▲ 22% vs. ontem</div>
+  </div>
+  <div class="kpi">
+    <div class="k-label"><i data-ic="zap"></i> Tempo 1ª resposta</div>
+    <div class="k-val">1.9<small>s</small></div>
+    <div class="k-delta flat">— estável</div>
+  </div>
+  <div class="kpi">
+    <div class="k-label"><i data-ic="check"></i> Taxa de fechamento</div>
+    <div class="k-val">34<small>%</small></div>
+    <div class="k-delta up">▲ 5 pts na semana</div>
+  </div>
+</div>
+
+<!-- ============ MAIN ============ -->
+<div class="main">
+
+  <!-- LEFT: conversation list -->
+  <div class="panel">
+    <div class="list-head">
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search" placeholder="Buscar por destino, nome ou device…">
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-f="all">Todas <span class="cnt" id="cAll">12</span></button>
+        <button class="tab" data-f="live">Em andamento <span class="cnt" id="cLive">7</span></button>
+        <button class="tab" data-f="done">Concluídas <span class="cnt" id="cDone">5</span></button>
+      </div>
+    </div>
+    <div class="conv-list" id="convList"></div>
+  </div>
+
+  <!-- CENTER: transcript -->
+  <div class="panel">
+    <div class="chat-head">
+      <div class="ch-av" id="chAv"><span data-flag="BR" title="Brasil"></span></div>
+      <div>
+        <div class="ch-name" id="chName">Maracaípe · lua de mel</div>
+        <div class="ch-sub" id="chSub">device_19f47df43a2-621a02</div>
+      </div>
+      <div class="ch-actions">
+        <button class="icon-btn" title="Marcar"><i data-ic="star"></i></button>
+        <button class="icon-btn" title="Exportar"><i data-ic="download"></i></button>
+        <button class="icon-btn" title="Mais"><i data-ic="more"></i></button>
+      </div>
+    </div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-foot">
+      <span class="obs"><span class="live-dot"></span> Você está observando — o vAI conduz a conversa</span>
+      <button class="take"><i data-ic="message"></i> Assumir no WhatsApp</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: trip context -->
+  <div class="panel ctx">
+    <div class="ctx-head">
+      <h3><i data-ic="compass"></i> Contexto da viagem</h3>
+      <p>Extraído automaticamente pelo vAI</p>
+    </div>
+    <div class="ctx-body">
+      <div class="ctx-block">
+        <div class="cb-title">Briefing captado</div>
+        <div class="field"><div class="fi"><i data-ic="pin"></i></div><div><div class="fl">Destino</div><div class="fv"><span data-flag="BR" title="Brasil"></span> Maracaípe, PE</div></div></div>
+        <div class="field"><div class="fi"><i data-ic="users"></i></div><div><div class="fl">Quem vai</div><div class="fv">Casal (lua de mel)</div></div></div>
+        <div class="field"><div class="fi"><i data-ic="calendar"></i></div><div><div class="fl">Quando</div><div class="fv">14–21 set · 7 noites</div></div></div>
+        <div class="field"><div class="fi"><i data-ic="wallet"></i></div><div><div class="fl">Orçamento</div><div class="fv">~ R$ 6.000</div></div></div>
+        <div class="field"><div class="fi"><i data-ic="sliders"></i></div><div><div class="fl">Estilo</div><div class="fv pend">confirmando…</div></div></div>
+      </div>
+
+      <div class="ctx-block">
+        <div class="cb-title">Completude do briefing</div>
+        <div class="prog"><i style="width:80%"></i></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">4 de 5 campos · pronto para roteiro</div>
+      </div>
+
+      <div class="ctx-block">
+        <div class="cb-title">Melhor oferta encontrada</div>
+        <div class="offer">
+          <div class="o-top"><span><i data-ic="plane"></i> REC · ida e volta</span><span class="o-price">R$ 1.180</span></div>
+          <div class="o-sub">GRU → REC · Azul · 1 parada · 8 set</div>
+        </div>
+        <div class="offer" style="margin-top:8px">
+          <div class="o-top"><span><i data-ic="bed"></i> Pousada Toka do Sol</span><span class="o-price">R$ 3.640</span></div>
+          <div class="o-sub">7 noites · frente-mar · café incluso · 9.1/10</div>
+        </div>
+      </div>
+
+      <div class="ctx-block">
+        <div class="cb-title">Sinais de intenção</div>
+        <div class="tagrow">
+          <span class="tag tag-hot">alta intenção</span>
+          <span class="tag">lua de mel</span>
+          <span class="tag">orçamento definido</span>
+          <span class="tag">datas firmes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="foot-note">Protótipo navegável · dados fictícios (conversas simuladas para demonstração) · base visual para montar a versão real do painel · Restrito a parceiros OND</div>
+
+<script>
+// ---------- ÍCONES (monocromáticos, line, currentColor) ----------
+const ICONS = {
+  activity:'<svg class="ic" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+  message:'<svg class="ic" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  zap:'<svg class="ic" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  check:'<svg class="ic" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+  compass:'<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+  pin:'<svg class="ic" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  users:'<svg class="ic" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  calendar:'<svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  wallet:'<svg class="ic" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>',
+  sliders:'<svg class="ic" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>',
+  plane:'<svg class="ic" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>',
+  bed:'<svg class="ic" viewBox="0 0 24 24"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8V6a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2"/></svg>',
+  star:'<svg class="ic" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  download:'<svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  more:'<svg class="ic" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>'
+};
+function icon(n){ return ICONS[n] || ''; }
+function hydrateIcons(root){ (root||document).querySelectorAll('[data-ic]').forEach(function(e){ e.outerHTML = icon(e.getAttribute('data-ic')); }); }
+hydrateIcons();
+
+// ---------- BANDEIRAS (SVG inline — funcionam em qualquer SO, inclusive Windows) ----------
+const FLAGS = {
+  BR:'<rect width="24" height="16" fill="#009b3a"/><polygon points="12,2 22,8 12,14 2,8" fill="#fedf00"/><circle cx="12" cy="8" r="3.3" fill="#002776"/>',
+  FR:'<rect width="8" height="16" fill="#0055a4"/><rect x="8" width="8" height="16" fill="#fff"/><rect x="16" width="8" height="16" fill="#ef4135"/>',
+  IT:'<rect width="8" height="16" fill="#009246"/><rect x="8" width="8" height="16" fill="#fff"/><rect x="16" width="8" height="16" fill="#ce2b37"/>',
+  AR:'<rect width="24" height="16" fill="#74acdf"/><rect y="5.33" width="24" height="5.34" fill="#fff"/><circle cx="12" cy="8" r="1.7" fill="#f6b40e"/>',
+  JP:'<rect width="24" height="16" fill="#fff"/><circle cx="12" cy="8" r="4.4" fill="#bc002d"/>',
+  MV:'<rect width="24" height="16" fill="#d21034"/><rect x="6" y="3" width="12" height="10" fill="#007e3a"/><circle cx="13" cy="8" r="3" fill="#fff"/><circle cx="14.4" cy="8" r="2.4" fill="#007e3a"/>',
+  US:'<rect width="24" height="16" fill="#b22234"/><g fill="#fff"><rect y="2.3" width="24" height="2.3"/><rect y="6.9" width="24" height="2.3"/><rect y="11.5" width="24" height="2.3"/></g><rect width="10" height="8.6" fill="#3c3b6e"/>',
+  ZA:'<rect width="24" height="16" fill="#de3831"/><rect y="8" width="24" height="8" fill="#002395"/><polygon points="0,0 11,8 0,16" fill="#fff"/><polygon points="0,1.6 9,8 0,14.4" fill="#007a4d"/><polygon points="0,3.2 6.5,8 0,12.8" fill="#000"/>'
+};
+function ccFromFlag(f){ try{ return Array.from(String(f)).map(function(ch){ return String.fromCharCode(ch.codePointAt(0)-127397); }).join(''); }catch(_){ return ''; } }
+function flagSvg(cc){
+  if(FLAGS[cc]) return '<svg class="flag-svg" viewBox="0 0 24 16" role="img" aria-label="'+cc+'">'+FLAGS[cc]+'</svg>';
+  return '<span class="flag-chip">'+(cc||'??')+'</span>';
+}
+function flagFor(emoji){ return flagSvg(ccFromFlag(emoji)); }
+function hydrateFlags(root){ (root||document).querySelectorAll('[data-flag]').forEach(function(e){ e.outerHTML = flagSvg(e.getAttribute('data-flag')); }); }
+hydrateFlags();
+
+// ---------- MOCK DATA ----------
+// flag = bandeira do país do destino · country = nome (tooltip)
+const CONVS = [
+  { id:'device_19f47df43a2-621a02', flag:'🇧🇷', country:'Brasil', name:'Maracaípe · lua de mel', dest:'Maracaípe, PE',
+    prev:'Perfeito, então frente-mar mesmo. Vou fechar…', time:'agora', status:'live', unread:0, sel:true },
+  { id:'device_88bc1e0a5f9-4410c3', flag:'🇫🇷', country:'França', name:'Paris em outubro', dest:'Paris, FR',
+    prev:'Vocês preferem hotel no centro ou perto da torre?', time:'agora', status:'live', unread:2 },
+  { id:'device_3a7d90ffee1-9928d1', flag:'🇦🇷', country:'Argentina', name:'Bariloche na neve', dest:'Bariloche, AR',
+    prev:'Quantas pessoas vão viajar com você?', time:'1 min', status:'live', unread:1 },
+  { id:'device_5510cc72bd8-1174af', flag:'🇲🇻', country:'Maldivas', name:'Maldivas — aniversário', dest:'Maldivas',
+    prev:'Fechado! Te mando as 3 opções agora.', time:'2 min', status:'live', unread:0 },
+  { id:'device_09ee43a1c6b-7781ab', flag:'🇺🇸', country:'Estados Unidos', name:'Orlando com crianças', dest:'Orlando, US',
+    prev:'São 2 adultos e 2 crianças, isso?', time:'3 min', status:'live', unread:0 },
+  { id:'device_ba22f10dd47-3390fe', flag:'🇯🇵', country:'Japão', name:'Japão mochilão', dest:'Tóquio, JP',
+    prev:'Digitando…', time:'4 min', status:'live', unread:0 },
+  { id:'device_77af0be9312-5502cc', flag:'🇧🇷', country:'Brasil', name:'Fernando de Noronha', dest:'Noronha, PE',
+    prev:'Preciso saber suas datas pra ver disponibilidade.', time:'6 min', status:'wait', unread:0 },
+  { id:'device_c41e78d0aa9-6640bd', flag:'🇮🇹', country:'Itália', name:'Roma clássica', dest:'Roma, IT',
+    prev:'Ótimo, boa viagem! Qualquer coisa é só chamar.', time:'12 min', status:'done', unread:0 },
+  { id:'device_22bd9f1e4c0-8823da', flag:'🇺🇸', country:'Estados Unidos', name:'Nova York réveillon', dest:'Nova York, US',
+    prev:'Reserva confirmada · enviei por e-mail.', time:'28 min', status:'done', unread:0 },
+  { id:'device_6d0a1177fb3-1209ef', flag:'🇿🇦', country:'África do Sul', name:'Safári África do Sul', dest:'Cidade do Cabo, ZA',
+    prev:'Show, fechamos o pacote então.', time:'41 min', status:'done', unread:0 },
+  { id:'device_afe3200c9d1-4471ba', flag:'🇦🇷', country:'Argentina', name:'Mendoza vinícolas', dest:'Mendoza, AR',
+    prev:'Obrigado! Bom passeio.', time:'1 h', status:'done', unread:0 },
+  { id:'device_1c8b45ea70f-9930cd', flag:'🇧🇷', country:'Brasil', name:'Porto de Galinhas', dest:'Ipojuca, PE',
+    prev:'Perfeito, confirmado. Até logo!', time:'2 h', status:'done', unread:0 },
+];
+
+// transcript for the featured conversation
+const TRANSCRIPT = [
+  { role:'ai',   t:'19:58', text:'Oi! Sou o vAI da OND 👋 Pra onde você tá pensando em viajar?' },
+  { role:'user', t:'19:59', text:'quero uma lua de mel em setembro, praia' },
+  { role:'ai',   t:'19:59', text:'Que máximo, parabéns! 💍 Vocês têm um destino em mente ou querem que eu sugira?' },
+  { role:'user', t:'20:00', text:'pensamos em Maracaípe' },
+  { role:'ai',   t:'20:00', text:'Ótima pedida — praia tranquila e romântica. Quantas noites vocês querem ficar?' },
+  { role:'user', t:'20:01', text:'uns 7 dias' },
+  { role:'ai',   t:'20:01', text:'Fechou, 7 noites. E qual seria o orçamento total de vocês pra viagem?' },
+  { role:'user', t:'20:02', text:'uns 6 mil no total' },
+  { role:'ai',   t:'20:02', text:'Perfeito, dá pra montar algo muito bom nesse valor. Já dei uma olhada:',
+    card:[ {ic:'plane',l:'GRU → REC · Azul',v:'R$ 1.180'}, {ic:'bed',l:'Pousada frente-mar · 7 noites',v:'R$ 3.640'} ] },
+  { role:'user', t:'20:03', text:'adorei! pode ser frente-mar mesmo' },
+];
+
+// live continuation (played out over time)
+const LIVE_QUEUE = [
+  { role:'ai', text:'Perfeito, então frente-mar mesmo. Vou fechar essa combinação e já te passo o resumo com valores finais 🙌' },
+  { role:'user', text:'e o café da manhã tá incluso?' },
+  { role:'ai', text:'Sim! Café da manhã incluso todos os dias, com frutas regionais e tapioca 🥥' },
+  { role:'user', text:'que delícia haha. e dá pra parcelar?' },
+  { role:'ai', text:'Dá sim — em até 10x sem juros no cartão. Quer que eu já gere o link de pagamento?' },
+  { role:'user', text:'quero!' },
+  { role:'ai', text:'Gerando o link agora ⏳ Só um instante que já te mando aqui.' },
+];
+
+// ---------- RENDER LIST ----------
+const listEl = document.getElementById('convList');
+let currentFilter='all', currentSel='device_19f47df43a2-621a02';
+
+function statusChip(s){
+  if(s==='live') return '<span class="stat-dot sd-live"><i></i>ao vivo</span>';
+  if(s==='wait') return '<span class="stat-dot sd-wait">aguardando</span>';
+  return '<span class="stat-dot sd-done">concluída</span>';
+}
+function matchFilter(c){
+  if(currentFilter==='all') return true;
+  if(currentFilter==='live') return c.status==='live'||c.status==='wait';
+  if(currentFilter==='done') return c.status==='done';
+}
+function renderList(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  listEl.innerHTML='';
+  CONVS.filter(matchFilter)
+    .filter(c=> !q || (c.name+c.dest+c.id).toLowerCase().includes(q))
+    .forEach(c=>{
+      const b=document.createElement('button');
+      b.className='conv'+(c.id===currentSel?' sel':'');
+      b.innerHTML=`
+        <div class="conv-top">
+          <div class="conv-av" title="${c.country}">${flagFor(c.flag)}</div>
+          <div class="conv-name">${c.name}</div>
+          <div class="conv-time">${c.time}</div>
+        </div>
+        <div class="conv-prev">${c.prev}</div>
+        <div class="conv-meta">
+          ${statusChip(c.status)}
+          <span style="font-size:10.5px;color:var(--muted-2);font-family:var(--mono)">${c.id.slice(0,20)}…</span>
+          ${c.unread?`<span class="conv-badge">${c.unread}</span>`:''}
+        </div>`;
+      b.onclick=()=>{ currentSel=c.id; renderList(); };
+      listEl.appendChild(b);
+    });
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active'); currentFilter=t.dataset.f; renderList();
+});
+document.getElementById('search').oninput=renderList;
+
+// ---------- RENDER TRANSCRIPT ----------
+const body=document.getElementById('chatBody');
+function bubble(m){
+  const el=document.createElement('div');
+  el.className='msg '+(m.role==='user'?'user':'ai');
+  let card='';
+  if(m.card){
+    card='<div class="card-inline">'+m.card.map(r=>`<div class="ci-row">${icon(r.ic)}<span style="flex:1">${r.l}</span><b>${r.v}</b></div>`).join('')+'</div>';
+  }
+  const who=m.role==='ai'?'<div class="who">✦ vAI</div>':'';
+  el.innerHTML=`<div class="bub">${who}${m.text.replace(/</g,'&lt;')}${card}</div><div class="mt">${m.t||nowT()}</div>`;
+  return el;
+}
+function nowT(){ return '20:0'+Math.min(9,3+liveIx)+''; }
+function scrollBottom(){ body.scrollTop=body.scrollHeight; }
+
+const day=document.createElement('div'); day.className='daysep'; day.innerHTML='<span>Hoje · 9 jul</span>';
+body.appendChild(day);
+TRANSCRIPT.forEach(m=>body.appendChild(bubble(m)));
+scrollBottom();
+
+// ---------- LIVE SIMULATION ----------
+let liveIx=0, typingEl=null;
+function showTyping(){
+  typingEl=document.createElement('div');
+  typingEl.className='typing';
+  typingEl.innerHTML='<i></i><i></i><i></i>';
+  body.appendChild(typingEl); scrollBottom();
+}
+function hideTyping(){ if(typingEl){typingEl.remove();typingEl=null;} }
+
+function playLive(){
+  if(liveIx>=LIVE_QUEUE.length){ liveIx=0; return; } // loop-ish stop
+  const m=LIVE_QUEUE[liveIx];
+  const delay = m.role==='ai'? 2600 : 1500;
+  if(m.role==='ai'){
+    showTyping();
+    setTimeout(()=>{
+      hideTyping();
+      body.appendChild(bubble({...m,t:clock()}));
+      scrollBottom(); liveIx++;
+      setTimeout(playLive, 1400);
+    }, delay);
+  } else {
+    body.appendChild(bubble({...m,t:clock()}));
+    scrollBottom(); liveIx++;
+    setTimeout(playLive, delay);
+  }
+}
+function clock(){
+  const base=20*60+4+liveIx; // minutes from 00:00 starting 20:04
+  const h=Math.floor(base/60), mm=base%60;
+  return String(h).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+}
+
+// KPI tiny jitter to feel alive
+setInterval(()=>{
+  const el=document.getElementById('kpiActive');
+  const base=7; const v=base+(Math.random()<.3?1:0)-(Math.random()<.15?1:0);
+  el.textContent=Math.max(5,v);
+},4000);
+
+renderList();
+setTimeout(playLive, 2500);
+</script>
+</body>
+</html>
